@@ -1,4 +1,3 @@
- 
 # pip install -U spacy
 # python -m spacy download en_core_web_sm
 
@@ -105,7 +104,7 @@ pd.set_option('display.max_colwidth', 200)
 #%matplotlib inline
 
 # import wikipedia sentences
-candidate_sentences = pd.read_csv("wiki_sentences_v2.csv")
+candidate_sentences = pd.read_csv("mytest.csv")
 candidate_sentences.shape
 
 #run in Console
@@ -118,10 +117,10 @@ for i in tqdm(candidate_sentences['sentence']):
     entity_pairs.append(get_entities(i))
 
 #run in Console
-#entity_pairs[10:20]
+print(entity_pairs[0:20])
 
 relations = [get_relation(i) for i in tqdm(candidate_sentences['sentence'])]
-#[print(get_relation(i)) for i in tqdm(candidate_sentences['sentence'])]
+[print(get_relation(i)) for i in tqdm(candidate_sentences['sentence'])]
     
 #pd.Series(relations).value_counts()[:50]
 
@@ -133,18 +132,11 @@ target = [i[1] for i in entity_pairs]
 
 kg_df = pd.DataFrame({'source':source, 'target':target, 'edge':relations})
 
-# extract subject
-source = [i[0] for i in entity_pairs]
-
-# extract object
-target = [i[1] for i in entity_pairs]
-
-kg_df = pd.DataFrame({'source':source, 'target':target, 'edge':relations})
-
-G=nx.from_pandas_edgelist(kg_df[kg_df['edge']=="composed by"], "source", "target", 
+G=nx.from_pandas_edgelist(kg_df, "source", "target", 
                           edge_attr=True, create_using=nx.MultiDiGraph())
 
 plt.figure(figsize=(12,12))
-pos = nx.spring_layout(G, k = 0.5) # k regulates the distance between nodes
-nx.draw(G, with_labels=True, node_color='skyblue', node_size=1500, edge_cmap=plt.cm.Blues, pos = pos)
+
+pos = nx.spring_layout(G)
+nx.draw(G, with_labels=True, node_color='skyblue', edge_cmap=plt.cm.Blues, pos = pos)
 plt.show()
